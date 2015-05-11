@@ -7,11 +7,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.IBinder;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.provider.MediaStore;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -83,10 +85,10 @@ public class MainActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_shuffle:
-                // ordenamiento aleatorio
+                // TODO imlpementar ordenamiento aleatorio
                 break;
             case R.id.action_end:
-                // para el servicio y sale de la app
+                // detiene el servicio y sale de la app
                 stopService(playIntent);
                 musicSrv = null;
                 System.exit(0);
@@ -114,7 +116,8 @@ public class MainActivity extends ActionBarActivity {
 
     public void getSongList() {
         ContentResolver musicResolver = getContentResolver();
-        Uri musicUri = android.provider.MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        //Obtengo todos los archivos de musica del SD card
+        Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
         Cursor musicCursor = musicResolver.query(musicUri, null, null, null, null);
 
         if(musicCursor!=null && musicCursor.moveToFirst()){
@@ -135,5 +138,8 @@ public class MainActivity extends ActionBarActivity {
             while (musicCursor.moveToNext());
         }
     }
-
+    public void songPicked(View view) {
+        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+        musicSrv.playSong();
+    }
 }
