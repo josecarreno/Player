@@ -109,21 +109,25 @@ public class MusicService extends Service implements
 
     @Override
     public boolean onError(MediaPlayer mp, int what, int extra) {
+        System.out.println("OnErrorService");
         mp.reset();
         return false;
     }
 
     @Override
     public void onDestroy() {
+        System.out.println("OnDestroyService");
         stopForeground(true);
     }
 
     @Override
     public void onPrepared(MediaPlayer mp) {
         //Iniciar playback
+        System.out.println("OnPrepared");
         mp.start();
         Intent notIntent = new Intent(this, MainActivity.class);
         notIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        notIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendInt = PendingIntent.getActivity(this, 0,
                 notIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 

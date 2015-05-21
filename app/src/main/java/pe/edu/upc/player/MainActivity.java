@@ -36,7 +36,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     private Intent playIntent;
     private boolean musicBound = false;
     private MusicController controller;
-    private boolean paused = false, playbackPaused = false;
+    private boolean paused = true, playbackPaused = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,15 +106,20 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     @Override
     protected void onStart() {
         super.onStart();
+        System.out.println("Start");
         if(playIntent == null){
             playIntent = new Intent(this, MusicService.class);
-            bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            boolean hola;
+            hola = bindService(playIntent, musicConnection, Context.BIND_AUTO_CREATE);
+            hola = hola;
             startService(playIntent);
         }
     }
 
     @Override
     protected void onDestroy() {
+        System.out.println("Destroy");
+        unbindService(musicConnection);
         stopService(playIntent);
         musicSrv=null;
         super.onDestroy();
@@ -145,16 +150,23 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         }
     }
     public void songPicked(View view) {
-        musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
-        musicSrv.playSong();
-        if(playbackPaused){
-            setController();
-            playbackPaused=false;
+        System.out.println("SongPicked");
+        try {
+            musicSrv.setSong(Integer.parseInt(view.getTag().toString()));
+            musicSrv.playSong();
+            if (playbackPaused) {
+                setController();
+                playbackPaused = false;
+            }
+            if (!controller.isShowing()) {
+                controller.show(0);
+            }
+        } catch(Exception ex){
+            ex.printStackTrace();
         }
-        controller.show(0);
     }
-
     public void setController() {
+        System.out.println("GetController");
         controller = new MusicController(this);
         controller.setPrevNextListeners(new View.OnClickListener() {
             @Override
@@ -178,7 +190,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
             setController();
             playbackPaused=false;
         }
-        controller.show(0);
+
     }
 
     //anterior
@@ -255,16 +267,22 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
 
     @Override
     protected void onPause(){
-        super.onPause();
+        System.out.println("Pausa");
         paused=true;
+        controller.hide();
+        super.onPause();
+
     }
 
     @Override
     protected void onResume(){
+        System.out.println("Resume");
         super.onResume();
+
         if(paused){
             setController();
             paused=false;
+            controller.show(0);
         }
     }
 
