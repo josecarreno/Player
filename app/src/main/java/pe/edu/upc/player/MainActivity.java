@@ -269,7 +269,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
     protected void onPause(){
         System.out.println("Pausa");
         paused=true;
-        controller.hide();
+        //controller.hide();
         super.onPause();
 
     }
@@ -282,7 +282,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         if(paused){
             setController();
             paused=false;
-            controller.show(0);
+            //controller.show(0);
         }
     }
 
