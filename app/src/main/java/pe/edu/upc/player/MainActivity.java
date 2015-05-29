@@ -47,7 +47,7 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         // Instancia el arrayList
         songList = new ArrayList<Song>();
         // Obtiene la lista de canciones
-        getSongList();
+        getSongList(null, null);
         // Ordena las canciones por titulo
         Collections.sort(songList, new Comparator<Song>() {
             public int compare(Song a, Song b) {
@@ -125,7 +125,14 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
         super.onDestroy();
     }
 
-    public void getSongList() {
+    public void getSongList(Integer page, Integer itemsPerPage) {
+        songList = null;
+        if (page == null || page <= 0){
+            page = 1;
+        }
+        if (itemsPerPage == null || itemsPerPage <=0) {
+            itemsPerPage = 10;
+        }
         ContentResolver musicResolver = getContentResolver();
         //Obtengo todos los archivos de musica del SD card
         Uri musicUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
@@ -139,12 +146,19 @@ public class MainActivity extends ActionBarActivity implements MediaPlayerContro
                     (android.provider.MediaStore.Audio.Media._ID);
             int artistColumn = musicCursor.getColumnIndex
                     (android.provider.MediaStore.Audio.Media.ARTIST);
+
             // agregar canciones a la lista
+            int limInf = (page - 1) * itemsPerPage;
+            int limSup = page * itemsPerPage;
+            int i = 1;
             do {
-                long thisId = musicCursor.getLong(idColumn);
-                String thisTitle = musicCursor.getString(titleColumn);
-                String thisArtist = musicCursor.getString(artistColumn);
-                songList.add(new Song(thisId, thisTitle, thisArtist));
+                if (i > limInf && i <= limSup) {
+                    long thisId = musicCursor.getLong(idColumn);
+                    String thisTitle = musicCursor.getString(titleColumn);
+                    String thisArtist = musicCursor.getString(artistColumn);
+                    songList.add(new Song(thisId, thisTitle, thisArtist));
+                }
+                i++;
             }
             while (musicCursor.moveToNext());
         }
